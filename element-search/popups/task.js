@@ -1,7 +1,6 @@
 const modalMainEl = document.getElementById('modal_main');
 const modalSuccess = document.getElementById('modal_success');
 
-const modalEl = document.getElementsByClassName('modal');
 const modalCloseEl = document.getElementsByClassName('modal__close');
 const showSuccessEl = document.getElementsByClassName('show-success');
 
