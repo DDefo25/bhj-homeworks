@@ -1,47 +1,38 @@
 const sliderArrowsEl = document.getElementsByClassName('slider__arrow');
 const sliderItemsEl = document.getElementsByClassName('slider__item');
+const sliderItemsArr = Array.from(sliderItemsEl);
 const sliderDotsEl = document.getElementsByClassName('slider__dot');
 
-const sliderItemsArr = Array.from(sliderItemsEl);
+function changeSlider(number) {
+    let activeSliderIndex = sliderItemsArr.findIndex(el => el.classList.contains('slider__item_active'));
+
+    sliderItemsEl[activeSliderIndex].classList.remove('slider__item_active');
+    sliderDotsEl[activeSliderIndex].classList.remove('slider__dot_active');
+
+    let nextActiveSliderIndex = number;
+    if (number >= sliderItemsArr.length) {
+        nextActiveSliderIndex = 0;
+    } else if (number < 0) {
+        nextActiveSliderIndex = sliderItemsArr.length - 1;
+    }
+
+    sliderItemsEl[nextActiveSliderIndex].classList.add('slider__item_active');
+    sliderDotsEl[nextActiveSliderIndex].classList.add('slider__dot_active');
+}
 
 Array.from(sliderArrowsEl, el => {
     el.onclick = () => {
-        if (el.classList.contains('slider__arrow_prev')) {
-            changeSliderByArrow('prev');
-        } else if (el.classList.contains('slider__arrow_next')) {
-            changeSliderByArrow('next');           
+        let activeSliderIndex = sliderItemsArr.findIndex(el => el.classList.contains('slider__item_active'));
+        if (el.classList.contains('slider__arrow_next')) {
+            changeSlider(activeSliderIndex + 1);
+        } else if (el.classList.contains('slider__arrow_prev')) {
+            changeSlider(activeSliderIndex - 1);        
         }
     }
-})
+});
 
-Array.from(sliderDotsEl, el => {
-    el.onclick = () => changeSliderByDot(el);
-})
-
-function changeSliderByArrow(direction) {
-    let activeSliderIndex = sliderItemsArr.findIndex(el => el.classList.contains('slider__item_active'));
-    sliderItemsEl[activeSliderIndex].classList.remove('slider__item_active');
-
-    if (direction === 'next') {
-        activeSliderIndex = ( activeSliderIndex === sliderItemsArr.length - 1 ) ? -1 : activeSliderIndex;
-        sliderItemsEl[activeSliderIndex + 1].classList.add('slider__item_active');
-    } else if (direction === 'prev') {
-        activeSliderIndex = ( activeSliderIndex === 0 ) ? sliderItemsArr.length : activeSliderIndex;
-        sliderItemsEl[activeSliderIndex - 1].classList.add('slider__item_active');
+Array.from(sliderDotsEl).forEach(el => {
+    el.onclick = () => {
+        changeSlider(Array.from(sliderDotsEl).indexOf(el));
     }
-}
-
-function changeSliderByDot(el) {
-    const activeDotsEl = document.querySelector('.slider__dot_active');
-    if (activeDotsEl !== null) {
-        activeDotsEl.classList.remove('slider__dot_active');
-    }
-
-    el.classList.add('slider__dot_active');
-    
-    const activeSliderIndex = sliderItemsArr.findIndex(el => el.classList.contains('slider__item_active'));
-    const activeDotIndex = Array.from(sliderDotsEl).findIndex(el => el.classList.contains('slider__dot_active'));
-
-    sliderItemsEl[activeSliderIndex].classList.remove('slider__item_active');
-    sliderItemsEl[activeDotIndex].classList.add('slider__item_active');
-}
+});

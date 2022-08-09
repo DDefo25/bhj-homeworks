@@ -14,6 +14,7 @@ Array.from(modalCloseEl, el => {
 
 Array.from(showSuccessEl, el => {
     el.onclick = () => {
+        modalMainEl.classList.remove('modal_active');
         modalSuccess.classList.add('modal_active');
     }
 });
