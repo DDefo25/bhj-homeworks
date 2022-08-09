@@ -31,7 +31,7 @@ Array.from(sliderArrowsEl, el => {
     }
 });
 
-Array.from(sliderDotsEl).forEach(el => {
+Array.from(sliderDotsEl, el => {
     el.onclick = () => {
         changeSlider(Array.from(sliderDotsEl).indexOf(el));
     }
