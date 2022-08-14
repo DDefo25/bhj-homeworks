@@ -3,7 +3,7 @@ const tabContentEl = document.getElementsByClassName('tab__content');
 
 [...tabEl].forEach(el => {
     el.addEventListener('click', () => {
-        changeTab([...tabEl].indexOf(el))
+        changeTab([...tabEl].indexOf(el));
     })
 })
 
