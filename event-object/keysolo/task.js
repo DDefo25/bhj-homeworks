@@ -1,127 +1,123 @@
 class Game {
-  constructor(container) {
-    this.container = container;
-    this.wordElement = container.querySelector('.word');
-    this.winsElement = container.querySelector('.status__wins');
-    this.lossElement = container.querySelector('.status__loss');
-    this.timerElement = container.querySelector('.timer');
-    this.timerId;
+    constructor(container) {
+        this.container = container;
+        this.statusWinsEl = container.querySelector('.status__wins');
+        this.statusLossEl = container.querySelector('.status__loss');
+        this.timerEl = container.querySelector('.timer');
+        this.phraseEl = container.querySelector('.phrase');
+        this.symbolEl = container.getElementsByClassName('symbol');
+        this.timerId = null;
 
-    this.reset();
+        this.setNewPhrase();
 
-    this.registerEvents();
+        this.startTimer();
 
-    this.startTimer();
-  }
-
-  reset() {
-    this.setNewWord();
-    this.winsElement.textContent = 0;
-    this.lossElement.textContent = 0;
-  }
-
-  registerEvents() {
-    document.addEventListener('keypress', event => {
-      if (this.currentSymbol.textContent === event.key.toLowerCase()) {
-        this.success();
-      } else {
-        this.fail();
-      }
-    })
-  }
-
-  startTimer() {
-    this.resetTimer();
-    this.timerId = setInterval(() => this.checkTimeRest(), 1000);
-  }
-
-  checkTimeRest() {
-    let timeRest = parseInt(this.timerElement.textContent);
-    timeRest--;
-
-    if (timeRest > 0) {
-      this.timerElement.textContent = this.parseTime(timeRest);
-    } else {
-      this.fail();
-    }
-  }
-
-  parseTime(time) {
-    if (time === 1) {
-      return `${time} секунда`
-    } else if (time > 1 && time < 5) {
-      return `${time} секунды`      
-    } else {
-      return `${time} секунд`
-    }
-  }
-
-  resetTimer() {
-    clearInterval(this.timerId);
-    this.timerId = null;
-    this.timerElement.textContent = this.parseTime(this.wordElement.childNodes.length);
-  }
-
-  success() {
-    this.currentSymbol.classList.add('symbol_correct');
-    this.currentSymbol = this.currentSymbol.nextElementSibling;
-    if (this.currentSymbol !== null) {
-      return;
+        this.keyAwaiting();
     }
 
-    if (++this.winsElement.textContent === 10) {
-      alert('Победа!');
-      this.reset();
+    setNewPhrase() {
+        const phraseBank = [
+            'hey jude',
+            'break on through',
+            'Пластмассовый мир победил',
+            'Spb точка ру',
+            'я люблю kitkat',
+            'snickers все же лучше',
+            'да пребудет с тобой сила'
+        ];
+
+        this.phraseEl.innerHTML = '';
+
+        const randomPhrase = phraseBank[Math.floor(Math.random() * phraseBank.length)];
+        [...randomPhrase].forEach(char => {
+            this.phraseEl.innerHTML += `<span class="symbol">${char.toLowerCase()}</span>`;
+        });
+
+        this.phraseEl.firstChild.classList.add('symbol__current');
     }
-    this.setNewWord();
-  }
 
-  fail() {
-    if (++this.lossElement.textContent === 5) {
-      alert('Вы проиграли!');
-      this.reset();
+    getCurrentSymbolCharCode() {
+        return [...this.symbolEl].find(el => el.classList.contains('symbol__current')).textContent.charCodeAt();
     }
-    this.setNewWord();
-  }
 
-  setNewWord() {
-    const word = this.getWord();
+    nextSymbol() {
+        const currentSymbolIndex = [...this.symbolEl].findIndex(el => el.classList.contains('symbol__current'));
+        [...this.symbolEl][currentSymbolIndex].classList.remove('symbol__current');
+        [...this.symbolEl][currentSymbolIndex].classList.add('symbol_correct');
+        
+        if ([...this.symbolEl][currentSymbolIndex + 1] === undefined) {
+            return this.win();
+        }
+        [...this.symbolEl][currentSymbolIndex + 1].classList.add('symbol__current');
+    }
 
-    this.renderWord(word);
-    this.startTimer();
-  }
+    win() {
+        this.statusWinsEl.textContent++;
+        this.setNewPhrase();
+        this.startTimer();
 
-  getWord() {
-    const words = [
-        'bob',
-        'awesome',
-        'netology',
-        'hello',
-        'kitty',
-        'rock',
-        'youtube',
-        'popcorn',
-        'cinema',
-        'love',
-        'javascript'
-      ],
-      index = Math.floor(Math.random() * words.length);
+        if (+this.statusWinsEl.textContent === 10) {
+            alert('Вы выиграли!');
+            this.reset();
+        }
+    }
 
-    return words[index];
-  }
+    loss() {
+        this.statusLossEl.textContent++;
+        this.setNewPhrase();
+        this.startTimer();
 
-  renderWord(word) {
-    const html = [...word]
-      .map(
-        (s, i) =>
-          `<span class="symbol ${i === 0 ? 'symbol_current': ''}">${s}</span>`
-      )
-      .join('');
-    this.wordElement.innerHTML = html;
+        if (+this.statusLossEl.textContent === 5) {
+            alert('Вы проиграли!');
+            this.reset();
+        }
+    }
 
-    this.currentSymbol = this.wordElement.querySelector('.symbol_current');
-  }
+    reset() {
+        this.statusWinsEl.textContent = 0;
+        this.statusLossEl.textContent = 0;
+        this.timerEl.textContent = 0;
+        
+        this.setNewPhrase();
+
+        this.startTimer();
+    }
+
+    keyAwaiting() {
+        document.addEventListener('keypress', event => {
+            const char = event.key.toLowerCase();
+
+            if (verifyChar(char.charCodeAt())) {
+                if (char.charCodeAt() === this.getCurrentSymbolCharCode()) {
+                    this.nextSymbol();
+                } else {
+                    this.loss();
+                }
+            }
+
+            function verifyChar(char) {
+                return char >= 97 && char <= 122 || 
+                char >= 1072 && char <= 1105 || 
+                char >= 32 && char <= 63;
+            }
+        })
+    }
+
+    startTimer() {
+        if (this.timerId !== null) {
+            clearInterval(this.timerId);
+            this.timerId = null;
+        }
+
+        this.timerEl.textContent = this.phraseEl.childNodes.length;
+        
+        this.timerId = setInterval(() => {
+            this.timerEl.textContent--;
+            if (+this.timerEl.textContent === 0) {
+                this.loss();
+            }
+        }, 1000);
+    }
 }
 
-new Game(document.getElementById('game'))
-
+new Game(document.querySelector('#game'));
