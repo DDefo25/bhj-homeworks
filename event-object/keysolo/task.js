@@ -109,15 +109,35 @@ class Game {
             this.timerId = null;
         }
 
-        this.timerEl.textContent = this.phraseEl.childNodes.length;
+        let timeLeft = this.phraseEl.childNodes.length;
+        this.timerEl.textContent = parseTime(timeLeft);
         
         this.timerId = setInterval(() => {
-            this.timerEl.textContent--;
-            if (+this.timerEl.textContent === 0) {
+            timeLeft--;
+            if (timeLeft > 0) {
+                this.timerEl.textContent = parseTime(timeLeft);
+            } else {
                 this.loss();
             }
         }, 1000);
-    }
+
+        function parseTime(time) {
+            const lastNum = time % 10;
+            const lastTwoNum = time % 100;
+
+            if (lastTwoNum >= 11 && lastTwoNum <= 14) {
+                return `${time} секунд`;
+            }
+
+            if (lastNum === 1) {
+              return `${time} секунда`
+            } else if (lastNum >= 2 && lastNum <= 4) {
+              return `${time} секунды`      
+            } else {
+              return `${time} секунд`
+            }
+        }
+    }        
 }
 
 new Game(document.querySelector('#game'));
