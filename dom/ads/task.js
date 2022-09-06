@@ -3,8 +3,6 @@ class Rotator {
         this.container = container;
         this.rotatorCaseEl = container.getElementsByClassName('rotator__case');
         this.rotatorId;
-
-        this.startRotator();
     }
 
     get activeCase() {
@@ -39,4 +37,5 @@ class Rotator {
     }
 }
 
-new Rotator(document.querySelector('.rotator'));
+const rotator1 = new Rotator(document.querySelector('.rotator'));
+rotator1.startRotator();
