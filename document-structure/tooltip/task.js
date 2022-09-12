@@ -3,7 +3,7 @@ class Tooltips {
         this.container = container;
         this.position = position;
         this.hasTooltips = container.querySelectorAll('.has-tooltip');
-        this.display = false;
+        this._display = false;
 
         window.addEventListener('load', () => {
             this.renderTooltips();
@@ -17,7 +17,9 @@ class Tooltips {
         [...this.hasTooltips].forEach(el => {
             el.addEventListener('click', event => {
                 event.preventDefault();
-                this.showTooltip(event.target);
+                if (this._display === true) {
+                    this.showTooltip(event.target);
+                }
             })
         })
 
@@ -42,11 +44,13 @@ class Tooltips {
     }
 
     showTooltip( el ) {
-        this.hideAll();
         const tooltip = el.nextElementSibling;
-
-        if (this._display === true) {
-            tooltip.classList.toggle('tooltip_active');
+        
+        if (!tooltip.classList.contains('tooltip_active')) {
+            this.hideAll();
+            tooltip.classList.add('tooltip_active');
+        } else {
+            this.hideAll();            
         }
 
         this.setPosition(tooltip, el);
@@ -55,15 +59,11 @@ class Tooltips {
     hideAll() {
         [...this.hasTooltips].forEach(el => el.nextElementSibling.classList.remove('tooltip_active'))
     }
-    
-    get display() {
-        return this._display;
-    }
 
-    set display(status) {
+    display(status) {
         this._display = status;
     }
 }
 
-const tooltip1 = new Tooltips(document.querySelector('body'), 'top');
-tooltip1.display = true;
+const tooltip = new Tooltips(document.querySelector('body'), 'top');
+tooltip.display(true);
