@@ -37,23 +37,14 @@ class Cart {
             quantity: +this.getProductQuantity( el ).textContent,
         }
 
-        if ( this.isEmptyCart() ) {
+        if ( this.isEmptyCart() || !(this.cart.find(product => product.id === productInCart.id)) ) {
             this.cart.push( productInCart );
             this.cartStorage.setItem('cart', JSON.stringify(this.cart));
             this.renderCart();
             this.movingProduct( productInCart );
-            return;           
-        }
-
-        const productIsInCart = this.cart.find(product => product.id === productInCart.id);
-
-        if (productIsInCart) {
-            productIsInCart.quantity += productInCart.quantity;
-            this.cartStorage.setItem('cart', JSON.stringify(this.cart));
-            this.renderCart();
-            this.movingProduct( productInCart );
         } else {
-            this.cart.push(productInCart);
+            const isInCart = this.cart.find(product => product.id === productInCart.id);
+            isInCart.quantity += productInCart.quantity;
             this.cartStorage.setItem('cart', JSON.stringify(this.cart));
             this.renderCart();
             this.movingProduct( productInCart );
@@ -90,7 +81,7 @@ class Cart {
 
     renderCart() {
         this.cartProductsEl.innerHTML = '';
-        if (this.isEmptyCart()) {
+        if (this.cartStorage.getItem('cart')) {
             this.cart = JSON.parse(this.cartStorage.getItem('cart'));
         }
 
