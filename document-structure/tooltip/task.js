@@ -37,10 +37,14 @@ class Tooltips {
 
     setPosition( tooltip, ownerTooltip ) {
         const pos = tooltip.dataset.position; 
-        let shiftY = ( pos === 'top' ) ? -tooltip.offsetHeight : ( pos === 'bottom' ) ? ownerTooltip.offsetHeight : 0;
-        let shiftX = ( pos === 'left' ) ? -tooltip.offsetWidth : ( pos === 'right' ) ? ownerTooltip.offsetWidth : 0;
-        tooltip.style.top = `${ ownerTooltip.offsetTop - scrollY + shiftY }px`;
-        tooltip.style.left = `${ ownerTooltip.offsetLeft - scrollX + shiftX }px`;
+        const tooltipCoord = tooltip.getBoundingClientRect();
+        const ownerTooltipCoord = ownerTooltip.getBoundingClientRect();
+
+        let shiftY = ( pos === 'top' ) ? -tooltipCoord.height : ( pos === 'bottom' ) ? ownerTooltipCoord.height : 0;
+        let shiftX = ( pos === 'left' ) ? -tooltipCoord.width : ( pos === 'right' ) ? ownerTooltipCoord.width : 0;
+
+        tooltip.style.top = `${ ownerTooltipCoord.y + shiftY }px`;
+        tooltip.style.left = `${ ownerTooltipCoord.x + shiftX }px`;
     }
 
     showTooltip( el ) {
