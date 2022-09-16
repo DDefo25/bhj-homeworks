@@ -3,9 +3,10 @@ class Planner {
         this.container = container;
         this.taskInput = container.querySelector('.tasks__input');
         this.taskAddBtn = container.querySelector('.tasks__add');
-        this.taskList = container.querySelector('.tasks__list');
-        
+        this.taskListEl = container.querySelector('.tasks__list');
+        this.taskList = [];
         this.tasksStorage = window.localStorage;
+        
         this.renderTasksFromStorage();
 
         this.registerEvents();
@@ -18,7 +19,7 @@ class Planner {
             const id = this.getTaskId();
             if ( value ) {
                 this.createTaskEl( id, value );
-                this.addTaskToStorage( id, value )
+                this.addTask( id, value )
             };
         })
     }
@@ -50,25 +51,35 @@ class Planner {
         const taskRemover = task.querySelector('.task__remove');
         taskRemover.onclick = () => this.removeTask( taskRemover );
 
-        this.taskList.appendChild( task );
+        this.taskListEl.appendChild( task );
 
     }
 
     removeTask( el ) {
         const taskEl = el.closest('.task');
-        this.tasksStorage.removeItem(taskEl.dataset.id);
+        const taskIndex = this.taskList.findIndex(el => el.id === taskEl.dataset.id)
+        this.taskList.splice(taskIndex, 1);
+        this.tasksStorage.setItem('tasks', JSON.stringify(this.taskList));
         taskEl.remove();
     }
 
-    addTaskToStorage( id, value ) {
-        this.tasksStorage.setItem( id, value );
+    addTask( id, value ) {
+        const task = {
+            id,
+            value,
+        }
+        this.taskList.push(task);
+        this.tasksStorage.setItem('tasks', JSON.stringify(this.taskList));
     }
 
     renderTasksFromStorage() {
-        for( let i = 0; i < this.tasksStorage.length; i++ ) {
-            const id = this.tasksStorage.key(i);
-            const value = this.tasksStorage.getItem(id);
-            this.createTaskEl(id, value);
+        if (this.tasksStorage.getItem('tasks')) {
+            this.taskList = JSON.parse(this.tasksStorage.getItem('tasks'));
+            console.log(this.taskList);
+            this.taskList.forEach(el => {
+                let {id, value} = el;
+                this.createTaskEl(id, value);
+            })
         }
     }
  
