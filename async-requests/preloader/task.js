@@ -14,7 +14,6 @@ class ExchangeRates {
         requestCurrencies.addEventListener('readystatechange', () => {
             if (requestCurrencies.readyState === requestCurrencies.DONE) {
                 this.currencies.setItem('currencies', JSON.stringify(requestCurrencies.response));
-                console.log('обновление')
                 this.renderExchangeRates();
             }
         });
