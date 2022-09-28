@@ -11,8 +11,8 @@ class Poll {
 
     registerEvent() {
         const pollRequest = this.getRequest('GET', 'https://netology-slow-rest.herokuapp.com/poll.php');
-        pollRequest.onreadystatechange = () => {
-            if (pollRequest.readyState === pollRequest.DONE) {
+        pollRequest.onload = () => {
+            if (pollRequest.statusText === 'OK') {
                 this.poll.voteId = pollRequest.response.id;
                 this.renderPoll( pollRequest.response );
             }
@@ -30,6 +30,7 @@ class Poll {
                 break;
             case 'GET':
                 xhr.send();
+                break;
         }
         return xhr;
     }
@@ -40,8 +41,8 @@ class Poll {
         
         const pollResult = this.getRequest('POST', 'https://netology-slow-rest.herokuapp.com/poll.php' );
 
-        pollResult.onreadystatechange = () => {
-            if (pollResult.readyState === pollResult.DONE) {
+        pollResult.onload = () => {
+            if (pollResult.statusText === 'OK') {
                 this.renderPollResult( pollResult.response );
             }
         }   

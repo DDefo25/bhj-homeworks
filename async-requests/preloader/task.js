@@ -11,12 +11,12 @@ class ExchangeRates {
 
     registerEvent() {
         const requestCurrencies = this.getRequest( this.url );
-        requestCurrencies.addEventListener('readystatechange', () => {
-            if (requestCurrencies.readyState === requestCurrencies.DONE) {
+        requestCurrencies.onload = () => {
+            if (requestCurrencies.statusText === 'OK') {
                 this.currencies.setItem('currencies', JSON.stringify(requestCurrencies.response));
                 this.renderExchangeRates();
             }
-        });
+        };
     }
 
     getRequest( url ) {
