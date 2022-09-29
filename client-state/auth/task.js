@@ -17,7 +17,18 @@ class Signin {
 
     registerEvent() {
         this.form.addEventListener('submit', e => {
-            this.loginReguest();
+            const requestLogin = Request.sendForm({
+                method: 'POST',
+                url: 'https://netology-slow-rest.herokuapp.com/auth.php',
+                responseType: 'json',
+                form: this.form,
+            });
+            
+            requestLogin.onload = () => {
+                if(requestLogin.statusText === 'OK') {
+                    this.checkLoginPass( requestLogin.response );
+                }
+            }
             e.preventDefault();
         })
 
@@ -26,23 +37,14 @@ class Signin {
         }
     }
 
-    loginReguest() {
-        const xhr = new XMLHttpRequest();
-        const formData = new FormData( this.form )
-        xhr.open('POST', 'https://netology-slow-rest.herokuapp.com/auth.php');
-        xhr.responseType = 'json';
-        xhr.onload = () => {
-            if(xhr.statusText === 'OK') {
-                if (xhr.response['success']) {
-                    this.login( xhr.response['user_id'] );
-                    this.clear();
-                } else {
-                    alert('Неверные логин/пароль');
-                    this.clear();
-                }
-            }
+    checkLoginPass( response ) {
+        if (response['success']) {
+            this.login( response['user_id'] );
+            this.clear();
+        } else {
+            alert('Неверные логин/пароль');
+            this.clear();
         }
-        xhr.send( formData );
     }
 
     login( userId ) {
@@ -62,6 +64,18 @@ class Signin {
     clear() {
         this.form.login.value = '';
         this.form.password.value = '';
+    }
+}
+
+class Request {
+    static sendForm( params ) {
+        let { method, url, responseType, form } = params;
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData( form )
+        xhr.open(method, url);
+        xhr.responseType = responseType;
+        xhr.send( formData );
+        return xhr;
     }
 }
 

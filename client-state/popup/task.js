@@ -1,13 +1,16 @@
 class SubscribeModal {
-    constructor(container, param) {
+    constructor(container, param = {}) {
         this.container = container;
-        this.param = param ? param : {};
+        this.param = param;
 
+        this.init();
+        this.registerEvent();
+    }
+
+    init() {
         if (this.param.show) {
             this.show();
         }
-
-        this.registerEvent();
     }
 
     registerEvent() {
@@ -15,7 +18,7 @@ class SubscribeModal {
     }
 
     show() {
-        if (!this.getCookie('subscribe-modal')) {
+        if (!Cookie.get('subscribe-modal')) {
             this.container.classList.add('modal_active');
             this.param.show = true;  
         } else {
@@ -25,17 +28,39 @@ class SubscribeModal {
 
     hide() {
         this.container.classList.remove('modal_active');
-        this.setCookie('subscribe-modal', 'hide')
+        Cookie.set('subscribe-modal', 'hide')
         this.param.show = false;
     }
 
-    getCookie( name ) {
+
+}
+
+class Cookie {
+    static get( name ) {
         const cookie = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'))
         return cookie ? decodeURIComponent(cookie[1]) : undefined;
     }
 
-    setCookie( name, value ) {
-        document.cookie = `${name}=${encodeURIComponent(value)}`
+    static set( name, value, options = {} ) {
+        let cookie = `${name}=${encodeURIComponent(value)}`
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        for (let option in options) {
+            cookie += "; " + option;
+            let value = options[option];
+            if (value !== true) {
+              cookie += "=" + value;
+            }
+          }
+
+        document.cookie = cookie;
+    }
+
+    static delete( name ) {
+        this.set( name, '', {'max-age': -1})
     }
 }
 
